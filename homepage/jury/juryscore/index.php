@@ -1,7 +1,6 @@
 <?php
 include "../../../assets/conn.php";
 include "../../../assets/header.php";
-include "../../../assets/bootstrap.php";
 
 // Get the group ID from the URL
 $groupId = isset($_GET['id']) ? $_GET['id'] : null;
