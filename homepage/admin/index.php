@@ -1,5 +1,6 @@
 <?php
 include "../../assets/conn.php";
+include "../../assets/header.php";  
 
 
 if(isset($_POST['submit'])) {
