@@ -6,6 +6,7 @@ $groupId = isset($_GET['id']) ? $_GET['id'] : null;
 if (!$groupId) {
     die("Group ID not provided.");
 }
+
 $query = "SELECT k.* 
           FROM Kandidaten k
           JOIN Kandidaten_has_Groepen kg ON k.id = kg.Kandidaten_id
@@ -16,7 +17,52 @@ $result = mysqli_query($conn, $query);
 if (!$result) {
     die("Database query failed: " . mysqli_error($conn));
 }
+
+// Verwerken van het formulier
+if (isset($_POST['vulin'])) {
+    $playerId = $_POST['player'];
+    $dscore = $_POST['dscore'];
+    $escore = $_POST['escore'];
+    $nscore = $_POST['nscore'];
+
+    $groepQuery = "SELECT onderdeel FROM Groepen WHERE id = $groupId";
+    $groepResult = mysqli_query($conn, $groepQuery);
+
+    if ($groepResult && $groepRow = mysqli_fetch_assoc($groepResult)) {
+        $onderdeel = $groepRow['onderdeel'];
+
+        // Bereken de totale score (D + E - N)
+        $totalScore = $dscore + $escore - $nscore;
+
+        $insertQuery = "INSERT INTO Punten (d_score, e_score, n_score, onderdeel, Groepen_id) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($insertQuery);
+        $stmt->bind_param("iiisi", $dscore, $escore, $nscore, $onderdeel, $groupId);
+
+        if ($stmt->execute()) {
+            $lastInsertId = $stmt->insert_id;
+
+            $relationQuery = "INSERT INTO Punten_has_Kandidaten (Punten_id, Kandidaten_id) VALUES (?, ?)";
+            $relationStmt = $conn->prepare($relationQuery);
+            $relationStmt->bind_param("ii", $lastInsertId, $playerId);
+
+            if ($relationStmt->execute()) {
+                echo "Scores succesvol toegevoegd aan de database.";
+            } else {
+                echo "Fout bij het toevoegen van de relatie aan Punten_has_Kandidaten: " . $relationStmt->error;
+            }
+
+            $relationStmt->close();
+        } else {
+            echo "Fout bij het toevoegen van scores aan de database: " . $stmt->error;
+        }
+
+        $stmt->close();
+    } else {
+        echo "Fout bij het ophalen van het onderdeel uit de database.";
+    }
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
