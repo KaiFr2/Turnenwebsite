@@ -4,41 +4,47 @@ include "../../assets/header.php";
 
 
 if(isset($_POST['submit'])) {
-    $succesfull = true;
-    $groepsnaam = isset($_POST['groupName']) ? htmlspecialchars($_POST['groupName']) : '';
-    $stmt = $conn->prepare("INSERT INTO groepen (groep) VALUES (?)");
-    $stmt->bind_param("s", $groepsnaam);
-    if ($stmt->execute()) {
-        $succesfull = true;
-        $groeps_id = mysqli_insert_id($conn);
-    } else {
-        $succesfull = false;
-    }
-    $playerCount = count($_POST['player']);
-    echo $playerCount;
-    $latest_id_array = array(); // Initialize the array outside the loop
-    for ($i = 1; $i <= $playerCount; $i++) {
-        $spelersnaam = isset($_POST['player' . $i]) ? htmlspecialchars($_POST['player' . $i]) : '';
-        $stmt = $conn->prepare("INSERT INTO kandidaten (naam) VALUES (?)");
-        $stmt->bind_param("s", $spelersnaam);
-        if ($stmt->execute()) {
-            $latest_id_array[] = mysqli_insert_id($conn);
-        } else {
-            $succesfull = false;
-        }
-}
-    foreach ($latest_id_array as $kandidaten_id) {
-        $stmt = $conn->prepare("INSERT INTO kandidaten_has_groepen (Kandidaten_id, Groepen_id) VALUES (?, ?)");
-        $stmt->bind_param("ii", $kandidaten_id, $groeps_id);
-        if ($stmt->execute()) {
-            echo "true";
-        } else {
-            echo "false";
-        }
-    }
-}
+  $succesfull = true;
+  
+  // Groepsinformatie
+  $groepsnaam = isset($_POST['groupName']) ? htmlspecialchars($_POST['groupName']) : '';
+  $onderdeel = isset($_POST['onderdeel']) ? htmlspecialchars($_POST['onderdeel']) : '';
 
+  // Voeg de groep toe aan de Groepen-tabel
+  $stmt = $conn->prepare("INSERT INTO groepen (groep, onderdeel) VALUES (?, ?)");
+  $stmt->bind_param("ss", $groepsnaam, $onderdeel);
+  if ($stmt->execute()) {
+      $succesfull = true;
+      $groeps_id = mysqli_insert_id($conn);
+  } else {
+      $succesfull = false;
+  }
 
+  // Spelerinformatie
+  $playerCount = count($_POST['player']);
+  $latest_id_array = array(); // Initialiseer de array buiten de loop
+  for ($i = 1; $i <= $playerCount; $i++) {
+      $spelersnaam = isset($_POST['player' . $i]) ? htmlspecialchars($_POST['player' . $i]) : '';
+      $stmt = $conn->prepare("INSERT INTO kandidaten (naam) VALUES (?)");
+      $stmt->bind_param("s", $spelersnaam);
+      if ($stmt->execute()) {
+          $latest_id_array[] = mysqli_insert_id($conn);
+      } else {
+          $succesfull = false;
+      }
+  }
+
+  // Koppel speler aan groep
+  foreach ($latest_id_array as $kandidaten_id) {
+      $stmt = $conn->prepare("INSERT INTO kandidaten_has_groepen (Kandidaten_id, Groepen_id) VALUES (?, ?)");
+      $stmt->bind_param("ii", $kandidaten_id, $groeps_id);
+      if ($stmt->execute()) {
+          echo "true";
+      } else {
+          echo "false";
+      }
+  }
+}
 ?>
 
 <!DOCTYPE html>
@@ -91,6 +97,11 @@ if(isset($_POST['submit'])) {
     <div class="form-group">
       <label for="groupName">Groep Naam:</label>
       <input type="text" class="form-control" name="groupName" placeholder="Vul groep naam in">
+    </div>
+
+    <div class="form-group">
+      <label for="onderdeel">Onderdeel:</label>
+      <input type="text" class="form-control" name="onderdeel" placeholder="Vul het onderdeel in">
     </div>
 
     <div id="playersContainer">
