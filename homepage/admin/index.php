@@ -22,7 +22,6 @@ if(isset($_POST['submit'])) {
 
   // Spelerinformatie
   $playerCount = count($_POST['player']);
-  var_dump($_POST['player']);
   $latest_id_array = array(); // Initialiseer de array buiten de loop
   for ($i = 0; $i <= $playerCount - 1; $i++) {
       $spelersnaam = isset($_POST['player'][$i]) ? htmlspecialchars($_POST['player'][$i]) : '';
