@@ -22,9 +22,10 @@ if(isset($_POST['submit'])) {
 
   // Spelerinformatie
   $playerCount = count($_POST['player']);
+  var_dump($_POST['player']);
   $latest_id_array = array(); // Initialiseer de array buiten de loop
-  for ($i = 1; $i <= $playerCount; $i++) {
-      $spelersnaam = isset($_POST['player' . $i]) ? htmlspecialchars($_POST['player' . $i]) : '';
+  for ($i = 0; $i <= $playerCount - 1; $i++) {
+      $spelersnaam = isset($_POST['player'][$i]) ? htmlspecialchars($_POST['player'][$i]) : '';
       $stmt = $conn->prepare("INSERT INTO kandidaten (naam) VALUES (?)");
       $stmt->bind_param("s", $spelersnaam);
       if ($stmt->execute()) {
