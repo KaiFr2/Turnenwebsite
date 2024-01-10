@@ -70,8 +70,21 @@ if (isset($_POST['vulin'])) {
         <h2>Turnen Scoring</h2>
         <form method="post">
             <input type="hidden" name="group_id" id="group_id" value="<?php echo $groupId; ?>">
+            <?php
+            // Fetch onderdeel from the database based on $groupId
+            $onderdeelQuery = "SELECT onderdeel FROM groepen WHERE id = $groupId";
+            $onderdeelResult = mysqli_query($conn, $onderdeelQuery);
+
+            if ($onderdeelResult && $onderdeelRow = mysqli_fetch_assoc($onderdeelResult)) {
+                $onderdeel = $onderdeelRow['onderdeel'];
+            }
+            ?>
             <div class="form-group">
-                <label for="player">Select Player:</label>
+                <label for="onderdeel">Onderdeel:</label>
+                <input type="text" class="form-control" name="onderdeel" value="<?php echo $onderdeel; ?>" readonly>
+            </div>
+            <div class="form-group">
+                <label for="player">Select Kandidaat:</label>
                 <select class="form-control" name="player" id="player">
                     <?php
                     while ($row = mysqli_fetch_assoc($result)) {
@@ -99,23 +112,15 @@ if (isset($_POST['vulin'])) {
                 }
 
                 function submitForm() {
-                // Add your form validation logic if needed
 
-                // Increment the selected player index
-                var playerSelect = document.getElementById('player');
-                var currentSelectedIndex = playerSelect.selectedIndex;
+                    var playerSelect = document.getElementById('player');
+                    var currentSelectedIndex = playerSelect.selectedIndex;
 
-                // Select the next player (if available)
-                if (currentSelectedIndex < playerSelect.options.length - 1) {
-                    playerSelect.selectedIndex = currentSelectedIndex + 1;
-                }
+                    if (currentSelectedIndex < playerSelect.options.length - 1) {
+                        playerSelect.selectedIndex = currentSelectedIndex + 1;
+                    }
 
-                // Submit the form
-                document.forms[0].submit();
-                }
-
-                function goToHomepage() {
-                    window.location.href = "/Turnen/turnenwebsite/homepage/admin";
+                    document.forms[0].submit();
                 }
                 </script>
             </div>
@@ -123,6 +128,7 @@ if (isset($_POST['vulin'])) {
     </div>
 </body>
 </html>
+
 
 
 

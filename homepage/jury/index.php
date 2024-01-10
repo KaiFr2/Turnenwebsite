@@ -50,7 +50,6 @@ if ($result->num_rows > 0) {
     $count = 0;
     while ($row = $result->fetch_assoc()) {
         if ($count % 4 == 0) {
-            // Start a new row after every 4 cards
             echo '</div><div class="row">';
         }
 
@@ -59,8 +58,10 @@ if ($result->num_rows > 0) {
                   <div class="card-body text-center">
                     <h5 class="card-title mb-3">'.$row['groep'].'</h5>';
 
-        // Voeg de knoppen toe voor de gewenste onderdelen
-        $onderdelen = array('Vloer', 'Voltige', 'Ringen', 'Sprong', 'Brug', 'Rekstok');
+        $uppercaseGender = strtoupper($row['geslacht']);
+        echo '<p class="card-text">'.$uppercaseGender.'</p>';
+
+        $onderdelen = ($uppercaseGender == 'VROUW') ? array('Sprong', 'Brug Ongelijk', 'Evenwichtsbalk', 'Vloer') : array('Vloer', 'Voltige', 'Ringen', 'Sprong', 'Brug', 'Rekstok');
         foreach ($onderdelen as $onderdeel) {
             echo '<a href="juryscore/?id='. $row['id'].'&onderdeel='.$onderdeel.'" class="btn btn-primary mt-1 mb-1">'.$onderdeel.'</a><br>';
         }
@@ -72,6 +73,9 @@ if ($result->num_rows > 0) {
     }
 }
 ?>
+
+
+
 
 
 </div>
