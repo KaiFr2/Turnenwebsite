@@ -43,37 +43,39 @@ include "../../assets/header.php"
 
   <div class="row">
 
-    <?php
-    $sql = "SELECT * FROM groepen";
-    $result = $conn->query($sql);
-    if ($result->num_rows > 0) {
-        $count = 0;
-        while ($row = $result->fetch_assoc()) {
-            if ($count % 4 == 0) {
-                // Start a new row after every 4 cards
-                echo '</div><div class="row">';
-            }
-
-            echo '<div class="col-md-3">
-                    <div class="card">
-                      <div class="card-body text-center">
-                        <h5 class="card-title mb-3">'.$row['groep'].'</h5>
-                        <a href="juryscore/?id='. $row['id'].'" class="btn btn-primary">Select '.$row['groep'].'</a>
-                      </div>
-                    </div>
-                  </div>';
-            $count++;
+  <?php
+$sql = "SELECT * FROM groepen";
+$result = $conn->query($sql);
+if ($result->num_rows > 0) {
+    $count = 0;
+    while ($row = $result->fetch_assoc()) {
+        if ($count % 4 == 0) {
+            // Start a new row after every 4 cards
+            echo '</div><div class="row">';
         }
+
+        echo '<div class="col-md-3">
+                <div class="card">
+                  <div class="card-body text-center">
+                    <h5 class="card-title mb-3">'.$row['groep'].'</h5>';
+
+        // Voeg de knoppen toe voor de gewenste onderdelen
+        $onderdelen = array('Vloer', 'Voltige', 'Ringen', 'Sprong', 'Brug', 'Rekstok');
+        foreach ($onderdelen as $onderdeel) {
+            echo '<a href="juryscore/?id='. $row['id'].'&onderdeel='.$onderdeel.'" class="btn btn-primary mt-1 mb-1">'.$onderdeel.'</a><br>';
+        }
+
+        echo '</div>
+            </div>
+          </div>';
+        $count++;
     }
-    ?>
+}
+?>
 
-  </div>
-
-  <!-- Additional content or form submission can be added here -->
 
 </div>
-
-<!-- Bootstrap JS and Popper.js scripts (if needed) -->
+</div>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>

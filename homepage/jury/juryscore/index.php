@@ -2,9 +2,10 @@
 include "../../../assets/conn.php";
 
 $groupId = isset($_GET['id']) ? $_GET['id'] : null;
+$onderdeel = isset($_GET['onderdeel']) ? $_GET['onderdeel'] : null;
 
-if (!$groupId) {
-    die("Group ID not provided.");
+if (!$groupId || !$onderdeel) {
+    die("Group ID or Onderdeel not provided.");
 }
 
 $query = "SELECT k.* 
@@ -25,43 +26,35 @@ if (isset($_POST['vulin'])) {
     $escore = $_POST['escore'];
     $nscore = $_POST['nscore'];
 
-    $groepQuery = "SELECT onderdeel FROM Groepen WHERE id = $groupId";
-    $groepResult = mysqli_query($conn, $groepQuery);
+    // Bereken de totale score (D + E - N)
+    $totalScore = $dscore + $escore - $nscore;
 
-    if ($groepResult && $groepRow = mysqli_fetch_assoc($groepResult)) {
-        $onderdeel = $groepRow['onderdeel'];
+    $insertQuery = "INSERT INTO Punten (d_score, e_score, n_score, onderdeel, Groepen_id) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($insertQuery);
+    $stmt->bind_param("iiisi", $dscore, $escore, $nscore, $onderdeel, $groupId);
 
-        // Bereken de totale score (D + E - N)
-        $totalScore = $dscore + $escore - $nscore;
+    if ($stmt->execute()) {
+        $lastInsertId = $stmt->insert_id;
 
-        $insertQuery = "INSERT INTO Punten (d_score, e_score, n_score, onderdeel, Groepen_id) VALUES (?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($insertQuery);
-        $stmt->bind_param("iiisi", $dscore, $escore, $nscore, $onderdeel, $groupId);
+        $relationQuery = "INSERT INTO Punten_has_Kandidaten (Punten_id, Kandidaten_id) VALUES (?, ?)";
+        $relationStmt = $conn->prepare($relationQuery);
+        $relationStmt->bind_param("ii", $lastInsertId, $playerId);
 
-        if ($stmt->execute()) {
-            $lastInsertId = $stmt->insert_id;
-
-            $relationQuery = "INSERT INTO Punten_has_Kandidaten (Punten_id, Kandidaten_id) VALUES (?, ?)";
-            $relationStmt = $conn->prepare($relationQuery);
-            $relationStmt->bind_param("ii", $lastInsertId, $playerId);
-
-            if ($relationStmt->execute()) {
-                echo "Scores succesvol toegevoegd aan de database.";
-            } else {
-                echo "Fout bij het toevoegen van de relatie aan Punten_has_Kandidaten: " . $relationStmt->error;
-            }
-
-            $relationStmt->close();
+        if ($relationStmt->execute()) {
+            echo "Scores succesvol toegevoegd aan de database.";
         } else {
-            echo "Fout bij het toevoegen van scores aan de database: " . $stmt->error;
+            echo "Fout bij het toevoegen van de relatie aan Punten_has_Kandidaten: " . $relationStmt->error;
         }
 
-        $stmt->close();
+        $relationStmt->close();
     } else {
-        echo "Fout bij het ophalen van het onderdeel uit de database.";
+        echo "Fout bij het toevoegen van scores aan de database: " . $stmt->error;
     }
+
+    $stmt->close();
 }
 ?>
+
 
 
 <!DOCTYPE html>
