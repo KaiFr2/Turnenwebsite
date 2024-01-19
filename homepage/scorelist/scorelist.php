@@ -75,6 +75,7 @@
           <th scope="col">E</th>
           <th scope="col">N</th>
           <th scope="col">Score</th>
+          <th scope="col">Onderdeel</th>
         </tr>
       </thead>
       <tbody>
@@ -85,6 +86,7 @@
           <td id='eScore'>6.75</td>
           <td id='nScore'>9.0</td>
           <td id='totalScore'>18.75</td>
+          <td id="onderdeel">Onderdeel</td>
         </tr>
         <!-- Add more rows as needed -->
       </tbody>
@@ -200,6 +202,7 @@
             document.getElementById("dScore").innerHTML = responseData[0]['d_score'];
             document.getElementById("eScore").innerHTML = responseData[0]['e_score'];
             document.getElementById("nScore").innerHTML = responseData[0]['n_score'];
+            document.getElementById("onderdeel").innerHTML = responseData[0]['onderdeel']
             document.getElementById("totalScore").innerHTML = responseData[0]['d_score'] + responseData[0]['e_score'] - responseData[0]['n_score'];
             document.getElementById('recent_score').style.display = '';
             document.getElementById('total_score').style.display = 'none';
