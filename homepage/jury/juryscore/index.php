@@ -21,7 +21,9 @@ if (!$result) {
 
 // Verwerken van het formulier
 if (isset($_POST['vulin'])) {
+    print_r($_POST);
     $playerId = $_POST['player'];
+    echo $playerId;
     $dscore = $_POST['dscore'];
     $escore = $_POST['escore'];
     $nscore = $_POST['nscore'];
@@ -29,9 +31,9 @@ if (isset($_POST['vulin'])) {
     // Bereken de totale score (D + E - N)
     $totalScore = $dscore + $escore - $nscore;
 
-    $insertQuery = "INSERT INTO Punten (d_score, e_score, n_score, onderdeel, Groepen_id) VALUES (?, ?, ?, ?, ?)";
+    $insertQuery = "INSERT INTO Punten (d_score, e_score, n_score, onderdeel, Groepen_id, kandidaten_id) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($insertQuery);
-    $stmt->bind_param("iiisi", $dscore, $escore, $nscore, $onderdeel, $groupId);
+    $stmt->bind_param("iiisii", $dscore, $escore, $nscore, $onderdeel, $groupId, $playerId);
 
     if ($stmt->execute()) {
         $lastInsertId = $stmt->insert_id;
@@ -72,7 +74,7 @@ if (isset($_POST['vulin'])) {
             <input type="hidden" name="group_id" id="group_id" value="<?php echo $groupId; ?>">
             <?php
             // Fetch onderdeel from the database based on $groupId
-            $onderdeelQuery = "SELECT onderdeel FROM groepen WHERE id = $groupId";
+            $onderdeelQuery = "SELECT onderdeel FROM punten WHERE Groepen_id = $groupId";
             $onderdeelResult = mysqli_query($conn, $onderdeelQuery);
 
             if ($onderdeelResult && $onderdeelRow = mysqli_fetch_assoc($onderdeelResult)) {
@@ -105,24 +107,6 @@ if (isset($_POST['vulin'])) {
                 </div>
                 <button type="submit" name="vulin" class="btn btn-success" onclick="submitForm()">Submit</button>
                 <button onclick="goToHomepage()" class="btn btn-danger">Back</button>
-
-                <script>
-                function goToHomepage() {
-                    window.location.href = "/Turnen/turnenwebsite/homepage/admin";
-                }
-
-                function submitForm() {
-
-                    var playerSelect = document.getElementById('player');
-                    var currentSelectedIndex = playerSelect.selectedIndex;
-
-                    if (currentSelectedIndex < playerSelect.options.length - 1) {
-                        playerSelect.selectedIndex = currentSelectedIndex + 1;
-                    }
-
-                    document.forms[0].submit();
-                }
-                </script>
             </div>
         </form>
     </div>
