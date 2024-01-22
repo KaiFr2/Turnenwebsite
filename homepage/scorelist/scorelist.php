@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -112,6 +111,7 @@
   </div>
 
   <script>
+    
     var currentUrl = window.location.href;
     var groepValue = currentUrl.split('=')
 
@@ -167,9 +167,11 @@
       });
     }
 
+  
+
 
     let screens = false;
-
+    switchScreens();
     function updateTable(apiResponse) {
       const tableBody = document.getElementById('scoreTable').getElementsByTagName('tbody')[0];
 
@@ -199,6 +201,7 @@
       if (screens) {
         getLatestScore1(groepValue[1])
           .then(() => {
+            document.getElementById("name").innerHTML = responseData[0]['naam'];
             document.getElementById("dScore").innerHTML = responseData[0]['d_score'];
             document.getElementById("eScore").innerHTML = responseData[0]['e_score'];
             document.getElementById("nScore").innerHTML = responseData[0]['n_score'];
